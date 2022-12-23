@@ -1,9 +1,13 @@
 from pyspark.sql import SparkSession
 
+from pyspark.sql.window import Window
+from pyspark.sql.functions import col, row_number, split
+
 spark = SparkSession.builder.master('local').getOrCreate()
 
-jobDf = spark.read.parquet('data/jobs.parquet')
-empDf = spark.read.parquet('data/employees.parquet')
-df = empDf.join(jobDf, empDf.job_id == jobDf.job_id, "inner") \
-    .filter("job_title='Sales Representative'").sort("salary", "first_name")
-df.select("first_name", "last_name", "salary", "job_title").show(11, truncate=False)
+department = spark.read.parquet('data/department.parquet')
+locations = spark.read.parquet('data/locations.parquet')
+employees = spark.read.parquet('data/employees.parquet')
+job_history = spark.read.parquet('data/job_history.parquet')
+
+job_history.join(employees, ["employee_id"]).show(200, False)
